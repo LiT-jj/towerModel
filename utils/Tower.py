@@ -10,6 +10,7 @@ class Tower:
         self.flag = True
         self.floors = None
         self.o2i = None
+        self.global_parmeter = dict()
         self.parseSheet(sheet)
 
     def parseSheet(self, sheet):
@@ -23,7 +24,7 @@ class Tower:
                     o2i[key] = idx
                 self.o2i = o2i
             else:
-                floor = Floor(record, self.o2i)
+                floor = Floor(record, self.o2i, self.global_parmeter)
                 floors[row] = floor
         self.floors = floors
 
@@ -31,18 +32,11 @@ class Tower:
         idx = 1
         win = None
         while idx <= len(self.floors) and self.flag:
-            res = self.floors[idx].forward(win=win)
+            res = self.floors[idx].forward()
             if res is None:
                 idx = idx + 1
-            elif type(res) == str:
-                if res == 'reset win':
-                    win = None
-                    idx = idx + 1
-                else:
-                    idx = int(res)
-            elif type(res) == tuple:
-                win = res
-                idx = idx + 1
+            else:
+                idx = int(res)
 
     def stop(self):
         self.flag = False

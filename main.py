@@ -13,17 +13,13 @@ def on_press(key):
         model.stop()
 
 
-def main():
-    global model
-    model.start()
-
-
 if __name__ == '__main__':
+    gloabl_parmeter = dict()
     # 监听线程
     listener = keyboard.Listener(on_press=on_press)
     listener.start()
 
-    xls = r'tower/logout.xls'
+    xls = r'zzy.xls'
     model = TowerModel(xls=xls)
-    model.run()
+    model.run(name='logout')
 

@@ -3,7 +3,7 @@ import time
 
 
 class Floor:
-    def __init__(self, record, o2i):
+    def __init__(self, record, o2i, global_parmeter):
         self.step = None
         self.type = None
         self.comment = None
@@ -11,6 +11,7 @@ class Floor:
         self.content = None
 
         self.o2i = o2i
+        self.global_parmeter = global_parmeter
         self.parse_record(record)
 
     def run(self):
@@ -24,26 +25,28 @@ class Floor:
         self.wait_time = record[o2i['wait_time']]
         self.content = record[o2i['content']]
 
-    def forward(self, win=None):
+    def forward(self):
         self.log()
         res = None
-        if self.type == 'clicks image':
-            opts.clicks_img(self.content)
-        if self.type == 'contains image':
-            flag = opts.contains_img(self.content)
-            assert flag, '指定区域没有图片...'
+        if self.type == 'click image':
+            opts.click_img(self.content, clickType='double')
         if self.type == 'set win':
-            res = opts.setWin(content=self.content)
+            win = opts.setWin(content=self.content)
+            self.global_parmeter['win'] = win
+        if self.type == 'reset win':
+            self.global_parmeter['win'] = None
         if self.type == 'input':
-            opts.write(self.content, win=win)
+            opts.write(self.content, win=self.global_parmeter['win'])
         if self.type == 'while_util_contain_image':
             opts.doWhileUtilContainImage(self.content)
         if self.type == 'if':
             res = opts.doIf(self.content)
         if self.type == 'print':
-            pass
-        if self.type == 'reset win':
-            res = 'reset win'
+            print(self.content)
+        if self.type == 'right click image':
+            opts.click_img(self.content, clickType='right')
+        if self.type == 'click pos':
+            opts.click(self.content, win=self.global_parmeter['win'])
         time.sleep(self.wait_time)
         return res
 
