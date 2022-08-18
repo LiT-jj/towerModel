@@ -31,7 +31,7 @@ class Tower:
     def start(self):
         idx = 1
         win = None
-        while idx <= len(self.floors) and self.flag:
+        while idx <= len(self.floors) and self.flag and idx != -1:
             res = self.floors[idx].forward()
             if res is None:
                 idx = idx + 1

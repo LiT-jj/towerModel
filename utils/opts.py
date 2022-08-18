@@ -18,19 +18,18 @@ def click_img(img_path, duration=0.2, confidence=0.9, clickType=None):
         pag.rightClick(box[0] + box[2], box[1])
 
 
-def click(content, win=None, clickType=None, duration=0.2):
-    x, y = content.split(',')
-    if win is not None:
-        x = int(x) + win[0]
-        y = int(y) + win[1]
-    pag.moveTo(x, y, duration=duration)
-    if clickType is None:
-        pag.click()
-    elif clickType == 'double':
-        pag.doubleClick()
+def click(content):
+    clickType, clickTime = content.split(' ')
+    if clickType == 'left':
+        if time == '1':
+            pag.click()
+        else:
+            pag.doubleClick()
     elif clickType == 'right':
         pag.rightClick()
 
+def press(content):
+    pag.press(content)
 
 def contain_img(img_path, confidence=0.8):
     box = pag.locateOnScreen(img_path, confidence=confidence)
@@ -40,16 +39,31 @@ def contain_img(img_path, confidence=0.8):
         return False
 
 
-def write(content, win=None, duration=0.2):
-    [pos, info] = content.split(' ')
-    [x, y] = pos.split(',')
-    pag.moveTo(int(x) + win[0], int(y) + win[1], duration=duration)
-    pag.click()
+def write(content, duration=0.2):
     pag.hotkey('ctrl', 'a')
     pag.press('backspace')
-    pag.write(info)
-    pag.press('enter')
+    pag.write(formatUnit(content), interval=0.1)
 
+def formatUnit(content):
+    if isinstance(content, float):
+        (_, num) = str(content).split('.')
+        if num == '0':
+            return str(int(content))
+    return content
+
+def moveTo(content, win=None, duration=0.2):
+    checkType, info = content.split(' ')
+    if checkType == 'image':
+        img_path, confidence = info.split(',')
+        box = pag.locateCenterOnScreen(img_path, confidence=confidence)
+        assert box is not None, 'opts.py function: moveTo info: 找不到指定图片{0}'.format(img_path)
+        pag.moveTo(box, duration=0.2)
+
+def moveBy(content, win=None, duration=0.2):
+    checkType, info = content.split(' ')
+    if checkType == 'pos':
+        x, y = info.split(',')
+        pag.move(int(x), int(y), duration=0.2)
 
 def doWhile(content, duration=0.2):
     pass
@@ -76,7 +90,8 @@ def doIf(content):
 def doCondition(condition):
     t, c = condition.split('-')
     if t == 'image':
-        return contain_img(c)
+        img_path, confidence = c.split(',')
+        return contain_img(img_path=img_path, confidence=confidence)
     return False
 
 
@@ -94,7 +109,3 @@ def setWin(content):
         assert box is not None, '找不到图片：{0}'.format(c)
         win = (int(box[0]), int(box[1]), int(box[0] + box[2]), int(box[1] + box[3]))
     return win
-
-
-if __name__ == '__main__':
-    doWhile(r'image C:\Users\LiT\Desktop\towerModel\img\loginPage.png')

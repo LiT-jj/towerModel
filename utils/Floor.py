@@ -12,6 +12,7 @@ class Floor:
 
         self.o2i = o2i
         self.global_parmeter = global_parmeter
+        self.global_parmeter['win'] = None
         self.parse_record(record)
 
     def run(self):
@@ -28,25 +29,34 @@ class Floor:
     def forward(self):
         self.log()
         res = None
-        if self.type == 'click image':
-            opts.click_img(self.content, clickType='double')
         if self.type == 'set win':
             win = opts.setWin(content=self.content)
             self.global_parmeter['win'] = win
         if self.type == 'reset win':
             self.global_parmeter['win'] = None
-        if self.type == 'input':
-            opts.write(self.content, win=self.global_parmeter['win'])
-        if self.type == 'while_util_contain_image':
-            opts.doWhileUtilContainImage(self.content)
+
         if self.type == 'if':
             res = opts.doIf(self.content)
+
+        if self.type == 'click':
+            opts.click(self.content)
+        if self.type == 'input':
+            opts.write(self.content)
+
+        if self.type == 'moveTo':
+            opts.moveTo(self.content, win=self.global_parmeter['win'])
+
+        if self.type == 'moveBy':
+            opts.moveBy(self.content, win=self.global_parmeter['win'])
+
+        if self.type == 'while_util_contain_image':
+            opts.doWhileUtilContainImage(self.content)
+
+        if self.type == 'press':
+            opts.press(self.content)
+
         if self.type == 'print':
             print(self.content)
-        if self.type == 'right click image':
-            opts.click_img(self.content, clickType='right')
-        if self.type == 'click pos':
-            opts.click(self.content, win=self.global_parmeter['win'])
         time.sleep(self.wait_time)
         return res
 

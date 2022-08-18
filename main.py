@@ -19,7 +19,7 @@ if __name__ == '__main__':
     listener = keyboard.Listener(on_press=on_press)
     listener.start()
 
-    xls = r'zzy.xls'
+    xls = r'bilibili.xls'
     model = TowerModel(xls=xls)
-    model.run(name='logout')
+    model.run(name='我的粉丝界面')
 
