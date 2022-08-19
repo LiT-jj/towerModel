@@ -21,5 +21,5 @@ if __name__ == '__main__':
 
     xls = r'bilibili.xls'
     model = TowerModel(xls=xls)
-    model.run(name='我的粉丝界面')
+    model.run(name='我的关注界面', floor=1)
 

@@ -6,7 +6,6 @@ import win32gui
 
 
 def click_img(img_path, duration=0.2, confidence=0.9, clickType=None):
-
     box = pag.locateOnScreen(img_path, confidence=confidence)
     assert box is not None, '找不到图片: {0}'.format(img_path)
     pag.moveTo(box, duration=duration)
@@ -21,15 +20,25 @@ def click_img(img_path, duration=0.2, confidence=0.9, clickType=None):
 def click(content):
     clickType, clickTime = content.split(' ')
     if clickType == 'left':
-        if time == '1':
+        if clickTime == '1':
             pag.click()
         else:
             pag.doubleClick()
     elif clickType == 'right':
         pag.rightClick()
 
+
 def press(content):
-    pag.press(content)
+    keys = content.split('+')
+    if len(keys) == 1:
+        pag.press(keys[0])
+    elif len(keys) == 2:
+        pag.hotkey(keys[0], keys[1])
+
+
+def scroll(content):
+    pag.scroll(int(content))
+
 
 def contain_img(img_path, confidence=0.8):
     box = pag.locateOnScreen(img_path, confidence=confidence)
@@ -44,12 +53,14 @@ def write(content, duration=0.2):
     pag.press('backspace')
     pag.write(formatUnit(content), interval=0.1)
 
+
 def formatUnit(content):
     if isinstance(content, float):
         (_, num) = str(content).split('.')
         if num == '0':
             return str(int(content))
     return content
+
 
 def moveTo(content, win=None, duration=0.2):
     checkType, info = content.split(' ')
@@ -58,12 +69,25 @@ def moveTo(content, win=None, duration=0.2):
         box = pag.locateCenterOnScreen(img_path, confidence=confidence)
         assert box is not None, 'opts.py function: moveTo info: 找不到指定图片{0}'.format(img_path)
         pag.moveTo(box, duration=0.2)
+    if checkType == 'pos':
+        x, y = info.split(',')
+        try:
+            pag.moveTo(int(x), int(y), duration=0.2)
+        except AssertionError as e:
+            print(e)
+
 
 def moveBy(content, win=None, duration=0.2):
     checkType, info = content.split(' ')
     if checkType == 'pos':
         x, y = info.split(',')
         pag.move(int(x), int(y), duration=0.2)
+
+
+def position():
+    pos = pag.position()
+    return 'pos {0},{1}'.format(pos.x, pos.y)
+
 
 def doWhile(content, duration=0.2):
     pass
@@ -92,6 +116,11 @@ def doCondition(condition):
     if t == 'image':
         img_path, confidence = c.split(',')
         return contain_img(img_path=img_path, confidence=confidence)
+    if t == 'pos':
+        left, top, right, bottom = c.split(',')
+        x, y = pag.position()
+        if int(left) < x < int(right) and int(top) < y < int(bottom):
+            return True
     return False
 
 

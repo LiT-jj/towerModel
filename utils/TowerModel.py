@@ -10,8 +10,12 @@ def parseExcel(xls, sheet=None):
         towers = dict()
         sheets = xls.sheets()
         for sheet in sheets:
+            names = sheet.name.split('の')
             tower = Tower(sheet)
-            towers[sheet.name] = tower
+            if len(names) > 1:
+                towers[names[0]].addSubTower(tower)
+            else:
+                towers[sheet.name] = tower
         return towers
     else:
         xls = xlrd.open_workbook(xls)
@@ -25,14 +29,13 @@ def parseExcel(xls, sheet=None):
 class TowerModel:
     def __init__(self, xls):
         self.xls = xls
-        self.towers = None
+        self.towers = parseExcel(xls=self.xls)
         pass
 
     # 执行某个tower模型
-    def run(self, name=None):
-        self.towers = parseExcel(xls=self.xls, sheet=name)
+    def run(self, name=None, floor=1):
         if name is not None:
-            self.towers[name].start()
+            self.towers[name].start(floor)
         else:
             for name in self.towers:
                 self.towers[name].start()

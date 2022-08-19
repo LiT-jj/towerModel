@@ -3,7 +3,7 @@ import time
 
 
 class Floor:
-    def __init__(self, record, o2i, global_parmeter):
+    def __init__(self, record, o2i, global_parmeter, tower):
         self.step = None
         self.type = None
         self.comment = None
@@ -13,7 +13,10 @@ class Floor:
         self.o2i = o2i
         self.global_parmeter = global_parmeter
         self.global_parmeter['win'] = None
+        self.global_parmeter['sub'] = None
+        self.global_parmeter['pos'] = None
         self.parse_record(record)
+        self.tower = tower
 
     def run(self):
         pass
@@ -37,18 +40,23 @@ class Floor:
 
         if self.type == 'if':
             res = opts.doIf(self.content)
+        if self.type == 'jump':
+            res = int(self.content)
 
         if self.type == 'click':
             opts.click(self.content)
         if self.type == 'input':
             opts.write(self.content)
-
+        if self.type == 'sub':
+            self.global_parmeter['sub'] = self.content
         if self.type == 'moveTo':
             opts.moveTo(self.content, win=self.global_parmeter['win'])
-
+        if self.type == 'rem pos':
+            self.global_parmeter['pos'] = opts.position()
+        if self.type == 'set pos':
+            opts.moveTo(self.global_parmeter['pos'])
         if self.type == 'moveBy':
             opts.moveBy(self.content, win=self.global_parmeter['win'])
-
         if self.type == 'while_util_contain_image':
             opts.doWhileUtilContainImage(self.content)
 
@@ -57,8 +65,12 @@ class Floor:
 
         if self.type == 'print':
             print(self.content)
+
+        if self.type == 'scroll':
+            opts.scroll(self.content)
+
         time.sleep(self.wait_time)
         return res
 
     def log(self):
-        print("步骤: {0}\t操作类型: {1}\t 功能描述:{2}".format(self.step, self.type, self.comment))
+        print("Tower: {3}\t步骤: {0}\t操作类型: {1}\t 功能描述:{2}\t等待时间: {4}".format(self.step, self.type, self.comment, self.tower, self.wait_time))
